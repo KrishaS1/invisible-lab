@@ -1,0 +1,9 @@
+import {readFileSync,existsSync} from "node:fs";
+import {describe,expect,it} from "vitest";
+import {arrivalGap,validateEarthDataset} from "./data";
+const bundle=JSON.parse(readFileSync('public/data/earth/stead-examples.json','utf8'));
+describe("bundled real earthquake recordings",()=>{
+ it("preserves complete three-component signals and manual arrival labels",()=>{const data=validateEarthDataset(bundle);expect(data.records).toHaveLength(2);expect(data.source.revision).toMatch(/^[a-f0-9]{40}$/);for(const r of data.records){expect(r.sfreq).toBe(100);expect(r.components).toEqual(['E','N','Z']);expect(r.unit).toBe('counts');expect(r.samples.Z).toHaveLength(6000);expect(r.pStatus).toBe('manual');expect(r.sStatus).toBe('manual');expect(r.sSample).toBeLessThan(3000);expect(Math.max(...r.samples.Z)).toBeGreaterThan(0);expect(Math.min(...r.samples.Z)).toBeLessThan(0);}expect(existsSync('public/licenses/STEAD-CC-BY-4.0.txt')).toBe(true);});
+ it("converts source sample indices into published arrival intervals",()=>{expect(arrivalGap(bundle.records[0].pSample,bundle.records[0].sSample,100)).toBeCloseTo(11.94,12);expect(arrivalGap(bundle.records[1].pSample,bundle.records[1].sSample,100)).toBeCloseTo(11.63,12);});
+ it("rejects missing samples, non-finite amplitudes, and reversed arrivals",()=>{const bad=structuredClone(bundle);bad.records[0].samples.Z.pop();expect(()=>validateEarthDataset(bad)).toThrow('incomplete');const nan=structuredClone(bundle);nan.records[0].samples.E[0]=NaN;expect(()=>validateEarthDataset(nan)).toThrow('incomplete');const reversed=structuredClone(bundle);reversed.records[0].pSample=reversed.records[0].sSample;expect(()=>validateEarthDataset(reversed)).toThrow('metadata');expect(()=>arrivalGap(10,5,100)).toThrow();expect(()=>arrivalGap(1,2,0)).toThrow();});
+});

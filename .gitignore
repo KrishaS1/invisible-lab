@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.venv/
+.tools/
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+
+# Raw downloads are reproducible from preprocessing/download_sources.py.
+# Prepared JSON in public/data is what the site actually loads.
+data/raw/

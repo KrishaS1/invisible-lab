@@ -1,0 +1,7 @@
+# Scientific preprocessing for Invisible Lab.
+# Python 3.11, 3.12, or 3.13 is the comfortable range.
+# The app was also prepared on Python 3.14 when wheels were available.
+numpy>=2.1
+scipy>=1.14
+mne>=1.9
+wfdb>=4.1

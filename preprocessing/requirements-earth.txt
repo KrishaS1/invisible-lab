@@ -1,0 +1,3 @@
+# Only required to regenerate Earth Lab JSON; not needed to run the website.
+h5py>=3.11
+numpy>=1.26
